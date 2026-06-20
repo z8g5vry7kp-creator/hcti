@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCTI — Hackathon Type Indicator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   HCTI — Cyberpunk Dark Theme Design System
+   Style: Cyberpunk UI / Tech Noir
+   Fonts: JetBrains Mono (heading) + IBM Plex Sans (body)
+   Colors: #0a0a0f bg, #00ff41 neon green, #00d4ff cyan
+   Dim Group Colors: H绿 C橙 E紫 T蓝 P红
+   ================================================================ */
+
+/* ----- RESET & BASE ----- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'IBM Plex Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #0a0a0f;
+  color: #e0e0e0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ----- SCANLINE OVERLAY ----- */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+  );
+  opacity: 0.3;
+}
+
+/* ----- BG GRID + GLOW ----- */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,255,65,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,65,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.bg-glow-1 {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 600px; height: 600px; border-radius: 50%;
+  filter: blur(200px); opacity: 0.10;
+  top: -250px; left: 50%; transform: translateX(-50%);
+  background: radial-gradient(circle, #00ff41 0%, transparent 70%);
+}
+.bg-glow-2 {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 400px; height: 400px; border-radius: 50%;
+  filter: blur(160px); opacity: 0.08;
+  bottom: -150px; right: -100px;
+  background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
+}
+
+/* ----- APP CONTAINER ----- */
+.app-container {
+  position: relative; z-index: 1;
+  max-width: 680px; margin: 0 auto; padding: 24px 20px 60px;
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+/* ----- PAGE TRANSITIONS ----- */
+.page { display: none; animation: pageIn 0.35s ease; }
+.page.active { display: block; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- TYPOGRAPHY ----- */
+h1, h2, h3, .mono {
+  font-family: 'JetBrains Mono', 'PingFang SC', 'Microsoft YaHei', monospace;
+}
+.neon-text {
+  text-shadow:
+    0 0 7px  rgba(0,255,65,0.5),
+    0 0 20px rgba(0,255,65,0.2),
+    0 0 40px rgba(0,255,65,0.08);
+}
+
+/* ================================================================
+   START PAGE
+   ================================================================ */
+.start-logo { text-align: center; margin-bottom: 32px; }
+.start-logo .logo-icon {
+  display: block; margin: 0 auto 12px; width: 64px; height: 64px;
+}
+.start-logo .logo-icon svg { width: 100%; height: 100%; }
+.start-logo h1 {
+  font-size: 2.6rem; font-weight: 900; letter-spacing: 6px;
+  background: linear-gradient(135deg, #00ff41 20%, #00d4ff 80%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; text-shadow: none;
+}
+.start-logo .tagline {
+  font-size: 0.9rem; color: #555; margin-top: 6px; letter-spacing: 3px;
+}
+.start-logo .sub-info {
+  font-size: 0.78rem; color: #444; margin-top: 4px; letter-spacing: 1px;
+}
+
+.intro-card {
+  background: #111118; border: 1px solid #1f1f2e; border-radius: 16px;
+  padding: 24px 22px; margin-bottom: 28px;
+}
+.intro-card h3 {
+  color: #00ff41; font-size: 1rem; font-weight: 600;
+  margin-bottom: 10px; letter-spacing: 1px;
+}
+.intro-card p {
+  color: #999; font-size: 0.88rem; line-height: 1.7;
+}
+.dim-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+}
+.dim-tags span {
+  font-family: 'JetBrains Mono', monospace;
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 1px;
+}
+.dim-tags .dt-h { background: #0a1a10; color: #00ff41; border: 1px solid #0d3a10; }
+.dim-tags .dt-c { background: #1a1008; color: #ff8c00; border: 1px solid #3a2008; }
+.dim-tags .dt-e { background: #10081a; color: #9b59b6; border: 1px solid #20103a; }
+.dim-tags .dt-t { background: #08101a; color: #3498db; border: 1px solid #10203a; }
+.dim-tags .dt-p { background: #1a0808; color: #e74c3c; border: 1px solid #3a1010; }
+
+.btn-start {
+  display: block; width: 100%; padding: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 3px;
+  border: none; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(135deg, #00ff41, #00b32d);
+  color: #0a0a0f;
+  box-shadow: 0 0 40px rgba(0,255,65,0.18);
+  transition: all 0.25s ease;
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 60px rgba(0,255,65,0.30);
+}
+.btn-start:active { transform: scale(0.98); }
+
+/* ================================================================
+   PROGRESS BAR
+   ================================================================ */
+.progress-wrap { margin-bottom: 24px; }
+.progress-info {
+  display: flex; justify-content: space-between; margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; color: #666;
+}
+.progress-track {
+  height: 4px; background: #1a1a28; border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #00ff41, #00d4ff);
+  transition: width 0.35s ease;
+  box-shadow: 0 0 8px rgba(0,255,65,0.3);
+}
+
+/* ================================================================
+   QUESTION PAGE
+   ================================================================ */
+.q-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: #00ff41; margin-bottom: 8px; letter-spacing: 1px;
+}
+.q-dim-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: #00d4ff;
+  background: #0d1a20; border: 1px solid #1a3a40;
+  padding: 3px 10px; border-radius: 10px;
+  margin-bottom: 14px; letter-spacing: 1px;
+}
+.q-text {
+  font-size: 1.2rem; font-weight: 600; line-height: 1.65; margin-bottom: 24px;
+  color: #e8e8e8;
+}
+
+.options-list { display: flex; flex-direction: column; gap: 10px; }
+.opt-btn {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 15px 16px; text-align: left;
+  background: #111118; border: 2px solid #1c1c2a; border-radius: 12px;
+  cursor: pointer; color: #bbb; font-size: 0.92rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.opt-btn:hover {
+  border-color: rgba(0,212,255,0.3);
+  background: #151522;
+}
+.opt-btn.selected {
+  border-color: #00ff41;
+  background: #0a1a10;
+  box-shadow: 0 0 18px rgba(0,255,65,0.08);
+}
+.opt-btn .opt-letter {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+  background: #1c1c2a; color: #777;
+  transition: all 0.2s ease;
+}
+.opt-btn.selected .opt-letter {
+  background: #00ff41; color: #0a0a0f;
+  box-shadow: 0 0 10px rgba(0,255,65,0.3);
+}
+.opt-btn .opt-level {
+  margin-left: auto; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: #555; padding: 2px 10px;
+  border-radius: 10px; background: #1a1a28;
+}
+.opt-btn.selected .opt-level {
+  color: #00ff41; background: #0d1a10;
+}
+
+.q-nav { display: flex; gap: 12px; margin-top: 24px; }
+.btn-nav {
+  flex: 1; padding: 13px; font-size: 0.9rem; font-weight: 600;
+  border: none; border-radius: 12px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+.btn-prev { background: #1a1a28; color: #888; }
+.btn-prev:hover { background: #222240; color: #aaa; }
+.btn-next {
+  background: linear-gradient(135deg, #00ff41, #00b32d);
+  color: #0a0a0f;
+}
+.btn-next:hover:not(:disabled) {
+  box-shadow: 0 0 28px rgba(0,255,65,0.22);
+}
+.btn-next:disabled { opacity: 0.25; cursor: not-allowed; box-shadow: none; }
+
+/* ================================================================
+   LOADING PAGE
+   ================================================================ */
+.loading-wrap { text-align: center; padding: 60px 0; }
+.loading-ring {
+  width: 44px; height: 44px; margin: 0 auto 20px;
+  border: 3px solid #1c1c2a;
+  border-top-color: #00ff41; border-right-color: #00d4ff;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: 'JetBrains Mono', monospace;
+  color: #00ff41; font-size: 1rem;
+  letter-spacing: 2px;
+  animation: pulse-text 1.5s ease-in-out infinite;
+}
+@keyframes pulse-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ================================================================
+   RESULT PAGE — HEADER
+   ================================================================ */
+.result-header { text-align: center; margin-bottom: 24px; }
+.result-badge {
+  display: inline-block; padding: 6px 20px; border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 3px;
+  background: linear-gradient(135deg, #00ff41, #00d4ff);
+  color: #0a0a0f; margin-bottom: 10px;
+}
+.result-type {
+  font-size: 2.2rem; font-weight: 900; letter-spacing: 4px;
+  background: linear-gradient(135deg, #00ff41 30%, #00d4ff 70%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; text-shadow: none;
+}
+.result-tagline { color: #00d4ff; font-size: 0.9rem; margin-top: 4px; }
+.result-match {
+  font-family: 'JetBrains Mono', monospace;
+  color: #00ff41; font-size: 1.3rem; font-weight: 700; margin-top: 6px;
+}
+
+/* ----- RESULT DESCRIPTION ----- */
+.result-desc {
+  background: #111118; border: 1px solid #1f1f2e; border-radius: 14px;
+  padding: 18px 20px; margin-bottom: 14px;
+}
+.result-desc p { color: #bbb; font-size: 0.9rem; line-height: 1.7; }
+
+/* ----- TEAM FIT / AVOID / WEAKNESS ----- */
+.info-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
+}
+.info-card {
+  background: #111118; border: 1px solid #1f1f2e; border-radius: 12px;
+  padding: 14px 16px;
+}
+.info-card.full-width { grid-column: 1 / -1; }
+.info-card h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; letter-spacing: 1px; margin-bottom: 8px;
+}
+.info-card h4.fit  { color: #00ff41; }
+.info-card h4.avoid { color: #ff6b6b; }
+.info-card h4.grow  { color: #ffd93d; }
+.info-card .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 0.78rem; padding: 4px 12px; border-radius: 16px;
+  border: 1px solid #2a2a3a; background: #1a1a28; color: #ccc;
+}
+.tag.fit  { border-color: rgba(0,255,65,0.25);  color: #00ff41; background: #0a1a10; }
+.tag.avoid { border-color: rgba(255,107,107,0.25); color: #ff6b6b; background: #1a1010; }
+.tag.grow  { border-color: rgba(255,217,61,0.25);  color: #ffd93d; background: #1a1808; }
+.tag.rec   { border-color: rgba(0,212,255,0.25);   color: #00d4ff; background: #08101a; }
+.info-card .desc-text {
+  font-size: 0.82rem; color: #999; line-height: 1.55; margin-top: 4px;
+}
+
+/* ----- CANVAS RADAR CHART ----- */
+.radar-wrap {
+  text-align: center; margin-bottom: 18px;
+  background: #111118; border: 1px solid #1f1f2e; border-radius: 14px;
+  padding: 18px 10px 10px;
+}
+.radar-wrap h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; color: #00d4ff; margin-bottom: 8px; letter-spacing: 1px;
+}
+canvas#radar-canvas {
+  max-width: 100%; height: auto;
+}
+
+/* ----- DIMENSION BARS ----- */
+.dim-section { margin-bottom: 18px; }
+.dim-section h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; color: #00d4ff; margin-bottom: 12px; letter-spacing: 1px;
+}
+.dim-group { margin-bottom: 14px; }
+.dim-group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; margin-bottom: 6px; letter-spacing: 2px;
+  padding: 2px 10px; border-radius: 6px; display: inline-block;
+}
+.dim-group-label.dg-h { color: #00ff41; background: #0a1a10; }
+.dim-group-label.dg-c { color: #ff8c00; background: #1a1008; }
+.dim-group-label.dg-e { color: #9b59b6; background: #10081a; }
+.dim-group-label.dg-t { color: #3498db; background: #08101a; }
+.dim-group-label.dg-p { color: #e74c3c; background: #1a0808; }
+.dim-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
+}
+.dim-row .dim-name {
+  width: 30px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; color: #aaa; flex-shrink: 0;
+}
+.dim-row .dim-bar-wrap {
+  flex: 1; height: 7px; background: #1a1a28; border-radius: 4px; overflow: hidden;
+}
+.dim-row .dim-bar-fill {
+  height: 100%; border-radius: 4px; transition: width 0.7s ease;
+}
+.dim-row .dim-val {
+  width: 24px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; font-weight: 700; text-align: right;
+}
+/* group-specific bar colors */
+.dg-h-fill { background: #00ff41; box-shadow: 0 0 8px rgba(0,255,65,0.4); }
+.dg-c-fill { background: #ff8c00; box-shadow: 0 0 8px rgba(255,140,0,0.4); }
+.dg-e-fill { background: #9b59b6; box-shadow: 0 0 8px rgba(155,89,182,0.4); }
+.dg-t-fill { background: #3498db; box-shadow: 0 0 8px rgba(52,152,219,0.4); }
+.dg-p-fill { background: #e74c3c; box-shadow: 0 0 8px rgba(231,76,60,0.4); }
+
+/* ----- TOP MATCHES ----- */
+.matches-section { margin-bottom: 18px; }
+.matches-section h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; color: #00ff41; margin-bottom: 10px; letter-spacing: 1px;
+}
+.match-card {
+  background: #111118; border: 1px solid #1f1f2e; border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.25s;
+}
+.match-card.top1 { border-color: rgba(0,255,65,0.35); }
+.match-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.2rem; font-weight: 900; width: 32px; text-align: center; color: #555;
+}
+.match-card.top1 .match-rank { color: #00ff41; }
+.match-card.top2 .match-rank { color: #00d4ff; }
+.match-card.top3 .match-rank { color: #ffd93d; }
+.match-info { flex: 1; }
+.match-name { font-weight: 700; font-size: 1rem; }
+.match-tagline { font-size: 0.8rem; color: #888; margin-top: 2px; }
+.match-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem; font-weight: 700; color: #00ff41;
+}
+
+/* ----- SHARE SECTION ----- */
+.share-section {
+  background: #111118; border: 1px solid #1f1f2e; border-radius: 14px;
+  padding: 18px; margin-bottom: 14px;
+}
+.share-section h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; color: #00d4ff; margin-bottom: 10px; letter-spacing: 1px;
+}
+.share-box {
+  background: #0a0a0f; border: 1px solid #1c1c2a; border-radius: 10px;
+  padding: 14px; font-size: 0.85rem; color: #bbb; line-height: 1.6;
+  margin-bottom: 10px; position: relative; white-space: pre-wrap; word-break: break-all;
+}
+.btn-copy {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem; font-weight: 600; letter-spacing: 1px;
+  border: 2px solid #1f1f2e; border-radius: 10px; cursor: pointer;
+  background: transparent; color: #00ff41;
+  transition: all 0.2s ease;
+}
+.btn-copy:hover { border-color: #00ff4166; background: #0a1a10; }
+.btn-copy.copied { border-color: #00ff41; background: #0a1a10; color: #00ff41; }
+
+/* ----- BOTTOM LINKS ----- */
+.bottom-links {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+}
+.bottom-link {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 13px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+  border: 1px solid #1f1f2e; border-radius: 12px; cursor: pointer;
+  background: #111118; color: #888;
+  transition: all 0.2s ease; text-decoration: none;
+}
+.bottom-link:hover { border-color: #2a2a3a; color: #ccc; }
+.bottom-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.btn-restart {
+  display: block; width: 100%; padding: 15px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; font-weight: 600; letter-spacing: 1px;
+  border: 2px solid #1f1f2e; border-radius: 12px; cursor: pointer;
+  background: transparent; color: #00ff41;
+  transition: all 0.2s ease; margin-top: 6px;
+}
+.btn-restart:hover { border-color: #00ff4166; background: #0a1a10; }
+.btn-cta {
+  display: block; width: 100%; padding: 15px; margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; font-weight: 700; letter-spacing: 1px;
+  border: none; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(135deg, #00d4ff, #0088aa);
+  color: #0a0a0f; transition: all 0.2s ease;
+}
+.btn-cta:hover { box-shadow: 0 0 30px rgba(0,212,255,0.25); }
+.btn-cta:active { transform: scale(0.98); }
+
+/* ----- FOOTER ----- */
+.app-footer {
+  text-align: center; padding: 20px 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: #333; letter-spacing: 2px;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 480px) {
+  .app-container { padding: 20px 14px 50px; }
+  .start-logo h1 { font-size: 2rem; letter-spacing: 4px; }
+  .result-type { font-size: 1.7rem; letter-spacing: 2px; }
+  .q-text { font-size: 1.05rem; }
+  .opt-btn { padding: 13px 14px; font-size: 0.88rem; }
+  .info-row { grid-template-columns: 1fr; }
+  .bottom-links { grid-template-columns: 1fr; }
+  canvas#radar-canvas { width: 100% !important; height: auto !important; }
+}
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .page { animation: none; }
+  .loading-ring { animation: none; border-top-color: #00ff41; }
+  .loading-text { animation: none; }
+  .dim-bar-fill { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- BG Effects -->
+<div class="bg-grid"></div>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<!-- ============================================================
+     APP CONTAINER
+     ============================================================ -->
+<div class="app-container" id="app">
+
+  <!-- ========== START PAGE ========== -->
+  <section class="page active" id="page-start">
+    <div class="start-logo">
+      <!-- SVG: circuit-chip icon (not emoji) -->
+      <div class="logo-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="8" width="48" height="48" rx="8" stroke="#00d4ff" stroke-width="2" fill="none" opacity="0.6"/>
+          <rect x="20" y="20" width="24" height="24" rx="4" stroke="#00ff41" stroke-width="2" fill="none"/>
+          <circle cx="32" cy="32" r="5" fill="#00ff41" opacity="0.8"/>
+          <line x1="32" y1="8" x2="32" y2="20" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="32" y1="44" x2="32" y2="56" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="8" y1="32" x2="20" y2="32" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="44" y1="32" x2="56" y2="32" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+          <rect x="4" y="14" width="8" height="4" rx="1" fill="#00ff41" opacity="0.6"/>
+          <rect x="52" y="14" width="8" height="4" rx="1" fill="#00ff41" opacity="0.6"/>
+          <rect x="4" y="46" width="8" height="4" rx="1" fill="#00ff41" opacity="0.6"/>
+          <rect x="52" y="46" width="8" height="4" rx="1" fill="#00ff41" opacity="0.6"/>
+        </svg>
+      </div>
+      <h1>HCTI</h1>
+      <p class="tagline">HACKATHON TYPE INDICATOR</p>
+      <p class="sub-info">5维 · 32题 · 27种黑客人格 · 组队匹配</p>
+    </div>
+
+    <div class="intro-card">
+      <h3>&gt; 发现你在黑客松中的超能力</h3>
+      <p>5分钟快速测评，从五大竞赛维度分析你的团队定位。你的回答会生成 15 维人格向量，匹配最接近的黑客松角色原型与组队建议。</p>
+      <div class="dim-tags">
+        <span class="dt-h">H 内核</span><span class="dt-c">C 创作</span><span class="dt-e">E 执行</span>
+        <span class="dt-t">T 团队</span><span class="dt-p">P 答辩</span>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startTest()" aria-label="开始测试">
+      &gt; 开 始 测 试 _
+    </button>
+    <div class="app-footer">HCTI v1.0 · 2026 Hackathon</div>
+  </section>
+
+  <!-- ========== QUESTION PAGE ========== -->
+  <section class="page" id="page-question">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="q-counter">第 1 / 31 题</span>
+        <span id="q-flow-label"></span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="q-number" id="q-num"></div>
+    <div class="q-dim-badge" id="q-dims"></div>
+    <div class="q-text" id="q-text"></div>
+
+    <div class="options-list" id="options-list" role="radiogroup" aria-label="答题选项"></div>
+
+    <div class="q-nav">
+      <button class="btn-nav btn-prev" id="btn-prev" onclick="prevQuestion()" aria-label="上一题">
+        &#x2190; 上一题
+      </button>
+      <button class="btn-nav btn-next" id="btn-next" onclick="nextQuestion()" disabled aria-label="下一题">
+        下一题 &#x2192;
+      </button>
+    </div>
+  </section>
+
+  <!-- ========== LOADING PAGE ========== -->
+  <section class="page" id="page-loading">
+    <div class="loading-wrap">
+      <div class="loading-ring"></div>
+      <p class="loading-text">正在分析你的人格向量...</p>
+    </div>
+  </section>
+
+  <!-- ========== RESULT PAGE ========== -->
+  <section class="page" id="page-result">
+    <div class="result-header">
+      <div class="result-badge" id="result-badge"></div>
+      <div class="result-type neon-text" id="result-type"></div>
+      <div class="result-tagline" id="result-tagline"></div>
+      <div class="result-match" id="result-match"></div>
+    </div>
+
+    <div class="result-desc">
+      <p id="result-desc"></p>
+    </div>
+
+    <!-- 适合分工 + 推荐队友 + 避坑提醒 + 短板优化 -->
+    <div class="info-row">
+      <div class="info-card">
+        <h4 class="fit">&gt; 适合分工</h4>
+        <div class="tags" id="team-fit"></div>
+      </div>
+      <div class="info-card">
+        <h4 class="avoid">&gt; 避坑提醒</h4>
+        <div class="desc-text" id="team-avoid"></div>
+      </div>
+      <div class="info-card">
+        <h4 class="rec">&gt; 推荐队友</h4>
+        <div class="tags" id="team-recs"></div>
+      </div>
+      <div class="info-card">
+        <h4 class="grow">&gt; 短板优化</h4>
+        <div class="desc-text" id="team-weakness"></div>
+      </div>
+    </div>
+
+    <!-- Canvas Radar Chart (5-axis pentagon) -->
+    <div class="radar-wrap">
+      <h3>&gt; 五维能力雷达</h3>
+      <canvas id="radar-canvas" width="560" height="400" aria-label="五维能力雷达图" role="img"></canvas>
+    </div>
+
+    <!-- 15 Dimension Bar Chart -->
+    <div class="dim-section">
+      <h3>&gt; 15维人格画像</h3>
+      <div id="dim-chart"></div>
+    </div>
+
+    <!-- Top 3 Matches -->
+    <div class="matches-section">
+      <h3>&gt; 匹配角色 TOP 3</h3>
+      <div id="matches-list"></div>
+    </div>
+
+    <!-- Share Section -->
+    <div class="share-section">
+      <h3>&gt; 分享你的结果</h3>
+      <div class="share-box" id="share-text"></div>
+      <button class="btn-copy" id="btn-copy" onclick="copyShare()" aria-label="复制分享文案">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        一键复制文案
+      </button>
+    </div>
+
+    <!-- Bottom Links -->
+    <div class="bottom-links">
+      <a class="bottom-link" href="#" onclick="alert('赛事规则页面 — 待队友接入')" aria-label="赛事规则">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        赛事规则
+      </a>
+      <a class="bottom-link" href="#" onclick="alert('社群二维码 — 待队友接入')" aria-label="社群入口">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        社群组队
+      </a>
+    </div>
+
+    <button class="btn-restart" onclick="restartTest()" aria-label="重新测试">
+      &#x21BA; 重新测试
+    </button>
+    <button class="btn-cta" onclick="alert('报名入口 — 待队友接入')" aria-label="报名参赛">
+      立即报名参赛
+    </button>
+    <div class="app-footer">HCTI v1.0 · 基于 SBTI 算法 · 娱乐测评工具</div>
+  </section>
+
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+/* ================================================================
+   HCTI FRAMEWORK — DATA LAYER（队友编辑入口）
+   ================================================================ */
+
+// ---- 15 Dimensions (fixed) ----
+const DIMS  = ['H1','H2','H3','C1','C2','C3','E1','E2','E3','T1','T2','T3','P1','P2','P3'];
+const DIM_GROUPS = [
+  { label:'H 内核', dims:[0,1,2],  css:'dg-h', fillCss:'dg-h-fill', color:'#00ff41' },
+  { label:'C 创作', dims:[3,4,5],  css:'dg-c', fillCss:'dg-c-fill', color:'#ff8c00' },
+  { label:'E 执行', dims:[6,7,8],  css:'dg-e', fillCss:'dg-e-fill', color:'#9b59b6' },
+  { label:'T 团队', dims:[9,10,11],css:'dg-t', fillCss:'dg-t-fill', color:'#3498db' },
+  { label:'P 答辩', dims:[12,13,14],css:'dg-p', fillCss:'dg-p-fill', color:'#e74c3c' },
+];
+
+// ---- 32 Questions ----
+// 字段: id, dims (15维索引), dimLabel, text, opts (A/B/C 文案), isBranch, isHidden
+const QUESTIONS = [
+  { id:1,  dims:[0,1],   dimLabel:'H1·H2',  text:'黑客松最后8小时，项目突发严重BUG功能瘫痪，你会？',
+    opts:['心态崩盘焦虑摆烂，放弃补救，坐等交作品','有点慌张，跟着队友一起尝试修复，尽力就行','冷静排查问题，快速复盘补救，熬夜也要稳住成品'] },
+  { id:2,  dims:[6,8],   dimLabel:'E1·E3',  text:'48小时黑客松开局，你的节奏是？',
+    opts:['前期疯狂摸鱼摆烂，最后10小时通宵赶工','正常推进，偶尔休息，按时完成所有分工','精准拆分节点，开局高效推进，提前完成预留优化时间'] },
+  { id:3,  dims:[10,9],  dimLabel:'T2·T1',  text:'团队开局分工混乱、没人主动牵头，你会？',
+    opts:['默默观望，等别人安排，自己被动服从','配合他人分工，做好自己的本职工作','主动站出统筹，根据每个人特长精准分配任务'] },
+  { id:4,  dims:[3,4],   dimLabel:'C1·C2',  text:'赛题选题阶段，你的选择倾向是？',
+    opts:['直接照搬热门模板选题，毫无创新点','参考优秀作品，做常规优化创新','挖掘小众痛点，打造差异化创新方案，架构完整新颖'] },
+  { id:5,  dims:[13,14], dimLabel:'P2·P3',  text:'即将上台路演答辩，你的状态是？',
+    opts:['极度紧张，害怕提问，大概率卡顿忘词','略有紧张，正常完成路演，应对常规提问','从容自信，气场稳定，预判评委问题提前准备'] },
+  { id:6,  dims:[2],     dimLabel:'H3',     text:'参赛核心目的是？',
+    opts:['纯混经历、凑时长，拿不拿奖无所谓','尽力参赛，有奖最好，没奖平常心','目标明确冲奖项，主动争取所有加分机会'] },
+  { id:7,  dims:[7],     dimLabel:'E2',     text:'遇到自己不会的技术难题，你会？',
+    opts:['直接摆烂，全权交给队友，自己不尝试解决','自行搜索尝试，解决不了再求助队友','深度排查复盘，快速突破难点，还能帮队友解决问题'] },
+  { id:8,  dims:[11],    dimLabel:'T3',     text:'队友提出和你相反的项目方案，你会？',
+    opts:['坚决反对，固执坚持自己的想法，拒绝妥协','理性对比优劣，折中选择最优方案','包容不同观点，整合双方优势，优化整体方案'] },
+  { id:9,  dims:[5],     dimLabel:'C3',     text:'项目收尾阶段，你会如何处理细节？',
+    opts:['随便交付，遗留BUG、文案错误、粗糙界面无所谓','修复明显漏洞，保证项目正常交付即可','全方位打磨细节，优化UI、文案、功能，极致完善'] },
+  { id:10, dims:[12],    dimLabel:'P1',     text:'制作答辩PPT时，你的习惯是？',
+    opts:['套用模板随便堆砌内容，不提炼亮点、不优化排版','排版整洁，内容完整，基础亮点清晰','精准提炼核心亮点，拔高项目价值，视觉质感拉满'] },
+  { id:11, dims:[3,2],   dimLabel:'C1·H3',  text:'看到同赛道往届高分作品同质化严重，你会？',
+    opts:['直接照搬同款思路，稳妥跟风不出错','参考成熟框架，小幅迭代优化细节','避开同质化赛道，挖掘全新切入点，打造差异化亮点'] },
+  { id:12, dims:[7,8],   dimLabel:'E2·E3',  text:'开发中途出现兼容性报错，全网无现成解决方案，你会？',
+    opts:['直接摆烂放弃，等待队友解决或妥协降级功能','查阅资料尝试排查，无解则和团队协商调整方案','持续断点调试、溯源排错，主动攻坚攻克疑难问题'] },
+  { id:13, dims:[9,10],  dimLabel:'T1·T2',  text:'队友长时间不更新进度、失联摸鱼，你会？',
+    opts:['默默焦虑，不敢询问，被动等待结果','礼貌询问进度，提醒时间节点，正常推进工作','主动对接沟通，明确卡点问题，重新分配任务兜底补位'] },
+  { id:14, dims:[0,6],   dimLabel:'H1·E1',  text:'赛程临时压缩12小时，整体进度严重滞后，你会？',
+    opts:['心态崩盘，自乱节奏，开始摆烂敷衍交付','略有慌乱，调整个人节奏，尽力追赶进度','快速重构时间规划，优先核心功能，高效抢进度保交付'] },
+  { id:15, dims:[14,12], dimLabel:'P3·P1',  text:'赛前1小时发现PPT有内容漏洞、亮点展示不足，你会？',
+    opts:['放任不管，硬着头皮上场，听天由命','简单修补明显错误，保证内容完整即可','快速优化页面结构、拔高项目亮点，紧急完善包装逻辑'] },
+  { id:16, dims:[4,5],   dimLabel:'C2·C3',  text:'团队快速搭建完基础功能，准备收尾交付，你会？',
+    opts:['直接交付，架构杂乱、细节瑕疵全部忽略','梳理基础架构，修复明显BUG，保证正常运行','重构优化模块化架构，统一代码规范，精细化打磨交互细节'] },
+  { id:17, dims:[11,1],  dimLabel:'T3·H2',  text:'新人队友方案稚嫩、想法不成熟，和你严重不符，你会？',
+    opts:['直接否定、拒绝采纳，固执坚持个人方案','筛选合理部分采纳，不合适的温和舍弃','耐心沟通引导，整合新人创意优势，优化整体方案'] },
+  { id:18, dims:[6,2],   dimLabel:'E1·H3',  text:'赛程空闲时段，队友都在休息摸鱼，你会？',
+    opts:['跟着一起摆烂休息，最后阶段再赶工','短暂休息放松，适时推进个人分工','利用空闲时间优化细节、预留备选方案，主动拉高项目上限'] },
+  { id:19, dims:[13,9],  dimLabel:'P2·T1',  text:'团队推选你上台路演，但你毫无准备、台词不熟，你会？',
+    opts:['坚决推脱，害怕失误，拒绝上台展示','勉强接下，快速熟悉内容，平稳完成基础路演','主动承接，快速梳理演讲逻辑，临场打磨表达话术'] },
+  { id:20, dims:[3,8],   dimLabel:'C1·E3',  text:'你有一个新颖但实现难度偏高的创新想法，你会？',
+    opts:['不敢尝试，直接放弃，选择稳妥普通方案','简化创新逻辑，落地基础版本，不追求极致','拆分难点分步落地，大胆创新尝试，打造项目亮点'] },
+  { id:21, dims:[1,14],  dimLabel:'H2·P3',  text:'初赛点评被评委全盘否定方案逻辑，你会？',
+    opts:['心态破防，自我否定，放弃后续优化冲刺','记录问题，小幅调整优化，尽力完成比赛','冷静吸收评委建议，快速迭代整改，逆风翻盘优化项目'] },
+  { id:22, dims:[10,7],  dimLabel:'T2·E2',  text:'团队多人卡点停滞，整体进度卡死，你会？',
+    opts:['束手无策，跟着停滞，等待他人破局','解决个人卡点，旁观团队问题，配合他人推进','主动梳理全局卡点，重新分工，协助队友逐个突破'] },
+  { id:23, dims:[5,12],  dimLabel:'C3·P1',  text:'撰写项目说明书、答辩文案时，你的习惯是？',
+    opts:['文字潦草、逻辑混乱，凑够字数即可','语句通顺、内容完整，符合竞赛基础要求','逻辑严谨、重点突出，精准拔高项目价值与落地意义'] },
+  { id:24, dims:[0,11],  dimLabel:'H1·T3',  text:'高压赶工阶段，队友情绪暴躁、频繁争执，你会？',
+    opts:['被情绪带动，跟着焦虑争执，加剧团队矛盾','保持沉默，不参与争吵，静待氛围缓和','稳住自身心态，调和团队矛盾，拉回正常工作节奏'] },
+  { id:25, dims:[8,4],   dimLabel:'E3·C2',  text:'赛前需要新增一个加分核心功能，你会？',
+    opts:['觉得来不及，直接拒绝新增、维持原样','评估难度，能做就简化落地，不强行加码','快速重构适配架构，高效落地新增功能，补齐项目短板'] },
+  { id:26, dims:[13,2],  dimLabel:'P2·H3',  text:'面对强队云集、竞争激烈的赛道，你会？',
+    opts:['直接摆烂认命，觉得必输，无心打磨项目','平常心参赛，尽力发挥，输赢随缘','正视差距、全力冲刺，精细化打磨每一处细节争取突围'] },
+  { id:27, dims:[9,3],   dimLabel:'T1·C1',  text:'头脑风暴环节，大家思路枯竭、无创新方向，你会？',
+    opts:['沉默旁观，不主动思考、不发表观点','附和他人想法，提供少量补充建议','主动输出多元脑洞，引导团队拓宽创新思路'] },
+  { id:28, dims:[6,14],  dimLabel:'E1·P3',  text:'临近截稿突然发现提交格式、文件规范出错，你会？',
+    opts:['慌乱无措，放弃整改，直接提交出错文件','紧急简单修正，保证格式合规，勉强提交','冷静梳理规范要求，快速整改校验，零失误完美提交'] },
+  { id:29, dims:[1,4],   dimLabel:'H2·C2',  text:'第一轮方案被全队推翻，需要从零重构，你会？',
+    opts:['心态炸裂不想重做，敷衍摆烂应付收尾','接受修改，按团队要求重新搭建基础方案','快速复盘旧方案问题，优化架构逻辑，高效重构升级方案'] },
+  { id:30, dims:[10,12], dimLabel:'T2·P1',  text:'团队成品完成后，无人负责最终复盘和包装整合，你会？',
+    opts:['坐等他人收尾，自己不参与整合工作','配合收尾工作，完成个人对应的复盘内容','主动统筹全局复盘，整合所有成果，统一包装输出'] },
+  { id:31, dims:[],      dimLabel:'分流',   text:'48小时黑客松高压赛程中，你最常用的解压方式是？',
+    opts:['独处放空、刷手机、安静休息','和队友闲聊调侃、轻度放松','熬夜小聚、饮酒放松'], isBranch:true },
+  { id:32, dims:[0,1],   dimLabel:'H1·H2 极值', text:'放松过后次日赛程紧张赶工，你的状态是？',
+    opts:['状态低迷、反应迟钝，大幅拖慢团队进度','缓慢进入状态，勉强跟上团队节奏','快速调整满血回归，抗压拉满，不影响项目推进'], isHidden:true },
+];
+
+// ---- Answer Schema ----
+const OPTION_VALUES = [1, 2, 3];
+const LEVEL_LABELS   = { 1:'L', 2:'M', 3:'H' };
+
+// ---- 25 Template Personality Vectors ----
+// ⚠️ 待 Stella/Ella 最终确定。字段说明：
+//   vec: 15维向量 (1-3)
+//   fit: 适合分工 (string[])
+//   avoid: 避坑提醒 (string)
+//   weakness: 短板优化建议 (string)
+//   recs: 推荐队友人格名 (string[])
+const TEMPLATES = [
+  // ---- 全能带队组 (高T+H) ----
+  { name:'LEADER 赛事掌舵者',  tagline:'天生队长，统筹控场抗压拉满',
+    desc:'天生团队队长，擅长整体统筹、分工控场，48小时全程把控项目节奏，对内协调矛盾，对外对接答辩，抗压能力顶级，能带领团队稳拿奖项。',
+    fit:['统筹控场','分工调度','答辩主讲'], avoid:'避免过度插手队友具体实现，给技术骨干留发挥空间',
+    weakness:'适当放权，不必事必躬亲。把非核心模块交给 STEAD 或 DEV 独立负责，你专注于全局节奏和资源协调。',
+    recs:['CAPTAIN','DEV','SPEAKER'], vec:[3,3,3, 2,2,2, 3,2,2, 2,3,2, 2,2,2] },
+  { name:'CAPTAIN 兜底队长',   tagline:'温和靠谱，队友摆烂就主动兜底',
+    desc:'温和靠谱的队长，不强势但极度负责，队友摆烂就主动兜底，查漏补缺，稳住项目基本盘，擅长带新手团队完成完整作品。',
+    fit:['进度把控','查漏补缺','团队协调'], avoid:'避免默默兜底所有事——及时暴露风险比独自扛更有效',
+    weakness:'学会在开局就明确分工边界，而不是后期被动补位。赛前30分钟做一次全局风险扫描。',
+    recs:['DEV','STEAD','WARM'], vec:[2,3,2, 2,2,2, 2,2,2, 2,3,3, 2,2,2] },
+  { name:'DOMIN 主导攻坚者',   tagline:'强势主导，拒绝摸鱼专注高效',
+    desc:'强势主导型，全程掌控项目方向，拒绝无效摸鱼，专注高效产出，擅长带领团队突破技术难点，执行力拉满。',
+    fit:['技术攻坚','项目主导','架构决策'], avoid:'避免在非关键问题上固执己见，给队友试错空间',
+    weakness:'多听 WARM 或 TEAM 型队友的反馈，尤其在方案分歧时先理解再判断。',
+    recs:['DEV','FIXER','FAST'], vec:[3,2,3, 2,2,2, 3,3,2, 2,2,2, 2,2,2] },
+
+  // ---- 技术硬核组 (高E+C) ----
+  { name:'DEV 硬核开发者',     tagline:'纯技术核心，代码即信仰',
+    desc:'纯技术核心，深耕代码开发，擅长落地功能、修复BUG，话少实干，不参与无效争论，用成品说话。',
+    fit:['核心开发','功能落地','BUG修复'], avoid:'避免完全沉默——至少每4小时同步一次进度，防止方向偏离',
+    weakness:'每天花10分钟和 CAPTAIN / SPEAKER 对齐你的技术方案对路演的影响。',
+    recs:['ARCH','FIXER','LEADER'], vec:[2,2,2, 3,3,3, 2,2,2, 1,1,2, 1,1,2] },
+  { name:'ARCH 架构设计师',    tagline:'从0到1搭建项目体系',
+    desc:'擅长整体项目架构、逻辑梳理，从0到1搭建项目体系，规避开发漏洞，让项目规范可落地。',
+    fit:['系统设计','技术选型','架构搭建'], avoid:'避免过度设计——MVP阶段"能跑"优先于"完美架构"',
+    weakness:'把架构图画在白板上让全队看得见，用 PLAN 型队友帮你做时间约束。',
+    recs:['DEV','PLAN','FIXER'], vec:[2,2,3, 3,3,2, 2,2,1, 3,3,3, 2,2,2] },
+  { name:'FIXER 问题修复者',   tagline:'BUG克星，专治疑难杂症',
+    desc:'BUG克星，擅长排查疑难问题，项目崩盘、功能失效时快速补救，是团队的救火队员。',
+    fit:['调试排查','紧急修复','联调保障'], avoid:'避免只在出问题时才出现——赛前主动巡检能减少救火次数',
+    weakness:'赛前1小时做一次全链路巡检，把问题消灭在萌芽。和 RESCUE 配合形成防御+应急双保险。',
+    recs:['DEV','RESCUE','ARCH'], vec:[3,2,2, 3,2,3, 3,2,2, 2,2,2, 2,2,2] },
+
+  // ---- 创意产品组 (高C) ----
+  { name:'IDEA 脑洞创造者',    tagline:'团队创意源泉，打破常规',
+    desc:'团队创意源泉，擅长打破常规，挖掘赛题创新角度，想出差异化选题，让项目从众多作品中脱颖而出。',
+    fit:['选题创新','方案设计','差异化定位'], avoid:'避免脑洞无限发散——48小时必须有一个可落地的收敛点',
+    weakness:'每个脑洞配一个"最低可行验证"：30分钟内写出伪代码或画原型图，用 IMPULS 帮你快速试。',
+    recs:['PROD','INNO','ARCH'], vec:[2,2,2, 3,2,2, 2,2,2, 2,2,2, 2,2,2] },
+  { name:'PROD 产品打磨师',    tagline:'注重用户体验，让项目完整精致',
+    desc:'专注项目细节打磨，优化交互、完善功能，注重用户体验，让项目完整精致、无明显短板。',
+    fit:['交互设计','体验优化','细节完善'], avoid:'避免在最后2小时还在调UI间距——细节打磨要卡在时间节点前完成',
+    weakness:'和 PLAN 一起制定"打磨截止线"，过了那个时间点所有细节冻结，交给 ART 做最终包装。',
+    recs:['IDEA','ART','DEV'], vec:[2,2,2, 2,3,3, 2,2,2, 2,2,2, 2,2,2] },
+  { name:'INNO 创新突围者',    tagline:'差异化创新，拒绝模板化',
+    desc:'主打差异化创新，拒绝模板化作品，擅长结合热点、新技术做突破，极易拿到创新奖项。',
+    fit:['创新突破','技术探索','差异化打法'], avoid:'避免为了新颖而牺牲可用性——评委先看能不能用，再看新不新',
+    weakness:'每引入一个新方案，做一次"2分钟能否讲清楚"测试，讲不清楚就简化。',
+    recs:['IDEA','DEV','SPEAKER'], vec:[2,2,2, 3,2,2, 2,2,2, 2,2,2, 2,2,2] },
+
+  // ---- 答辩宣传组 (高P) ----
+  { name:'SPEAKER 金牌答辩手', tagline:'上台气场全开，故事打动评委',
+    desc:'上台气场全开，表达流畅感染力强，擅长讲好项目故事，打动评委，拉高整体评分。',
+    fit:['路演主讲','评委问答','价值表达'], avoid:'避免台上讲的和实际做的不一致——提前30分钟和全队对齐路演口径',
+    weakness:'制作"评委可能问的10个问题"清单，和 RESCUE 做一轮模拟问答。',
+    recs:['PPT','ART','BIZ'], vec:[2,2,2, 2,2,2, 2,2,2, 2,2,2, 2,3,3] },
+  { name:'ART 视觉包装师',     tagline:'PPT美化、UI设计、文案拔高',
+    desc:'精通PPT美化、UI设计、文案拔高，擅长把普通项目包装出高级质感，视觉呈现满分。',
+    fit:['PPT设计','UI美化','文案包装'], avoid:'避免只追求美观而忽略信息传达——每个视觉元素都要为评分服务',
+    weakness:'和 SPEAKER 对齐每页PPT的"一句话核心信息"，确保视觉不盖过内容。',
+    recs:['SPEAKER','PPT','DEV'], vec:[2,2,2, 2,2,2, 2,2,2, 2,2,2, 3,2,2] },
+  { name:'RESCUE 临场救场者',  tagline:'答辩万能兜底，临危不乱',
+    desc:'答辩万能兜底，面对评委刁钻提问、突发失误，能快速圆场救场，稳住答辩成绩。',
+    fit:['临场应变','风险兜底','答辩救场'], avoid:'避免只靠临场发挥——最好的救场是赛前做好了应急预案',
+    weakness:'提前列出3个最可能翻车的环节（Demo崩、网络断、评委刁钻问题），每个准备一套Plan B。',
+    recs:['SPEAKER','FIXER','CAPTAIN'], vec:[2,2,2, 2,2,2, 2,2,2, 2,2,2, 2,2,3] },
+
+  // ---- 稳健躺平组 (M占比高) ----
+  { name:'STEAD 稳健配合者',   tagline:'最靠谱的队员，不拖后腿',
+    desc:'最靠谱的团队组员，服从安排、踏实干活、不拖后腿，稳定完成所有分工，适配任何组队节奏。',
+    fit:['稳定执行','模块开发','配合协作'], avoid:'避免只做被安排的事——遇到更好的做法主动提出来',
+    weakness:'尝试在每次分工后加一句"我觉得可以这样优化"，慢慢培养主动输出意识。',
+    recs:['LEADER','CAPTAIN','ANY'], vec:[2,2,2, 2,2,2, 2,2,2, 2,2,2, 2,2,2] },
+  { name:'EASY 佛系参赛人',    tagline:'体验为主，不内卷不焦虑',
+    desc:'参赛主打体验，不内卷、不焦虑，输赢无所谓，享受组队开发过程，心态极度松弛。',
+    fit:['辅助开发','测试反馈','氛围担当'], avoid:'避免完全躺平——至少认领一个对团队有价值的明确任务',
+    weakness:'主动和 CAPTAIN 说"给我一个能独立完成的小模块"，从成就感中找到参赛动力。',
+    recs:['STEAD','WARM','ANY'], vec:[1,2,1, 2,2,2, 2,1,2, 2,2,2, 2,2,2] },
+  { name:'TEAM 百搭协作人',    tagline:'适配所有团队，包容度极高',
+    desc:'适配所有团队风格，擅长配合不同队友，包容度高，能快速融入团队，化解小矛盾。',
+    fit:['跨组协作','需求对接','矛盾调解'], avoid:'避免过度迁就导致自己任务堆积——你的分工也需要被保护',
+    weakness:'学会在"配合他人"和"完成自己分工"之间设时间边界，用 PLAN 型队友帮你划这条线。',
+    recs:['LEADER','ANY','ANY'], vec:[2,2,2, 2,2,2, 2,2,2, 2,3,3, 2,2,2] },
+
+  // ---- 竞赛内耗组 (极端特质) ----
+  { name:'ANX 高压内耗者',     tagline:'技术尚可但高压下极度焦虑',
+    desc:'技术能力尚可，但高压环境下极度焦虑，容易自我怀疑，心态内耗影响发挥。',
+    fit:['模块开发(需减压环境)','测试'], avoid:'避免在最后6小时做关键决策——高压时判断力最差',
+    weakness:'感到焦虑时立刻和 WARM 或 CALM 型队友聊5分钟，不要自己硬扛。把大任务拆成30分钟小任务降低心理负担。',
+    recs:['WARM','CAPTAIN','STEAD'], vec:[1,2,2, 2,2,2, 2,2,2, 2,2,2, 2,2,2] },
+  { name:'LOST 方向迷茫者',    tagline:'初次参赛，等待被点亮',
+    desc:'参赛无目标，不知道该做什么、擅长什么，全程跟风队友，被动完成任务。',
+    fit:['资料整理','竞品调研','辅助测试'], avoid:'避免全程被动等待分配——每3小时主动问一次"我能帮什么"',
+    weakness:'赛前花15分钟做一个简单的自评：你擅长什么？你想学什么？然后带着这两个答案去找队长。',
+    recs:['LEADER','WARM','STEAD'], vec:[1,1,1, 1,1,1, 2,1,1, 1,1,2, 1,1,2] },
+  { name:'IMPULS 冲动攻坚者',  tagline:'脑洞大执行强，但容易踩坑',
+    desc:'脑洞大、执行力强，但容易冲动踩坑，盲目开发导致项目翻车，需要队友把控节奏。',
+    fit:['快速原型','MVP冲刺'], avoid:'避免拿到需求就直接写代码——先花5分钟和ARCH确认可行性',
+    weakness:'用"冲动刹车法"：每次准备大规模开发前，强制和 ARCH / PLAN 做2分钟快速评审。',
+    recs:['ARCH','PLAN','CAPTAIN'], vec:[2,3,3, 3,1,1, 3,3,2, 2,1,1, 2,2,2] },
+  { name:'SOLO 独行技术人',    tagline:'技术强但不喜协作，习惯单打独斗',
+    desc:'技术能力强但不喜协作，习惯单打独斗，沟通被动，容易和团队脱节。',
+    fit:['独立模块','算法攻坚','工具开发'], avoid:'避免完全脱离团队节奏——你的模块最终要和其他人的接起来',
+    weakness:'设定"强制同步点"：每2小时在群里发一条进度更新（一句话即可），让队友知道你在哪。',
+    recs:['TEAM','WARM','LEADER'], vec:[3,3,2, 3,3,2, 2,2,2, 1,1,1, 1,1,1] },
+
+  // ---- 小众特殊组 ----
+  { name:'PLAN 极致规划者',    tagline:'赛前精准规划，节奏严谨',
+    desc:'赛前精准规划所有节点，分工细化到小时，节奏严谨，绝不临时赶工，项目交付极其规范。',
+    fit:['时间规划','任务拆解','流程管理'], avoid:'避免规划过于刚性——预留20%缓冲时间应对突发状况',
+    weakness:'在计划中主动设置"弹性时段"，接受小范围调整，用 FLEX 型队友的反馈来校准。',
+    recs:['ARCH','CAPTAIN','FAST'], vec:[2,2,2, 2,2,2, 3,2,2, 3,3,2, 2,2,2] },
+  { name:'FLEX 灵活变通者',    tagline:'赛题变动快速调整，随机应变',
+    desc:'赛题变动、项目翻车时快速调整方案，不固执死板，擅长随机应变适配变化。',
+    fit:['方案调整','风险应对','灵活补位'], avoid:'避免频繁变动方向让队友跟不上——每次调整先通知全队',
+    weakness:'每次方案调整后花2分钟记录"为什么改"和"新方向是什么"，避免团队信息断层。',
+    recs:['IMPULS','RESCUE','CAPTAIN'], vec:[2,2,2, 2,2,2, 2,2,2, 2,2,3, 2,2,2] },
+  { name:'WARM 团队暖心者',    tagline:'凝聚团队，缓解高压氛围',
+    desc:'技术普通但擅长凝聚团队，缓解高压氛围，安抚队友情绪，避免团队崩盘。',
+    fit:['团队氛围','冲突调解','新人引导'], avoid:'避免只关注他人而忽略自己的分工——你也需要完成你的模块',
+    weakness:'给自己设一个"专注开发时段"（如每2小时中的90分钟），其余30分钟用来照顾团队。',
+    recs:['ANX','LOST','LEADER'], vec:[2,2,2, 2,2,2, 2,2,2, 2,2,3, 2,2,2] },
+  { name:'SHARP 犀利点评者',   tagline:'精准指出问题，优化项目短板',
+    desc:'擅长发现项目漏洞、评审痛点，精准指出问题，辅助团队优化项目短板。',
+    fit:['代码审查','方案评估','质量把控'], avoid:'避免只批评不给方案——每个问题至少配一条可操作的改进建议',
+    weakness:'用"问题+方案"格式表达：先说"这里有个问题"，然后立刻接"建议这样改"。',
+    recs:['ARCH','DEV','PLAN'], vec:[2,2,3, 3,3,3, 2,2,2, 3,2,2, 2,2,2] },
+  { name:'FAST 极速落地者',    tagline:'效率拉满，提前交付',
+    desc:'效率拉满，极速完成开发、文案、PPT等所有工作，提前交付预留优化时间。',
+    fit:['快速开发','MVP冲刺','交付加速'], avoid:'避免速度优先导致质量失控——提前交付的时间要用来打磨而不是摸鱼',
+    weakness:'提前交付后主动把时间交给 SHARP 或 PROD 做快速审查，用他们的反馈做一轮优化。',
+    recs:['PLAN','ARCH','PPT'], vec:[2,2,2, 3,2,2, 3,3,2, 2,2,2, 2,2,2] },
+  { name:'CALM 极致稳心态者',  tagline:'全程心态平稳，默默稳住局面',
+    desc:'无论项目崩盘、时间紧迫、评委刁难，全程心态平稳，无情绪波动，默默稳住局面。',
+    fit:['危机处理','技术兜底','压阵定心'], avoid:'避免过于冷静让队友觉得你不在乎——适度表达关注也是一种团队信号',
+    weakness:'在关键时刻主动说一句"别慌，我们一步步来"——你的冷静需要通过语言传递出去。',
+    recs:['ANX','IMPULS','LEADER'], vec:[2,3,3, 3,3,2, 2,2,2, 3,3,2, 2,2,2] },
+];
+
+// ---- Hidden Personalities ----
+const HIDDEN_NOOB = {
+  name:'NOOB 竞赛巨婴', tagline:'隐藏·全程划水，团队挂件',
+  desc:'多维度L低分堆叠，全程依赖队友，无自主能力，遇事摆烂。参赛建议：先从小任务入手，明确一个能独立完成的模块。',
+  fit:['资料整理','测试反馈','现场协助'], avoid:'避免全程等待指令——每场比赛至少主动认领一个独立任务',
+  weakness:'下次参赛前先做一个"我能独立做什么"的清单，带着明确目标报名。',
+  recs:['CAPTAIN','WARM','STEAD']
+};
+const HIDDEN_GOD = {
+  name:'GOD 赛事全能神', tagline:'隐藏·千分之一稀有，六边形战士',
+  desc:'15维度全H极值！能带队、能开发、能创意、能答辩、心态无敌，一人扛起全队，可独立完成完整竞赛项目的六边形全能选手。',
+  fit:['任何位置','全局统筹','终极兜底'], avoid:'避免一人包揽所有事——把能力转化为"教队友做"而不是"替队友做"',
+  weakness:'你的天花板就是团队的天花板。多花时间带新人，把个人能力转化为团队能力才是真正的全能。',
+  recs:['ANY','ANY','ANY']
+};
+
+
+/* ================================================================
+   FRAMEWORK LOGIC
+   ================================================================ */
+
+// ---- State ----
+let currentQ = 0;
+let answers = {};
+let showQ32 = false;
+let lastShareText = '';
+
+// ---- Page Navigation ----
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + name);
+  if (el) el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---- Start ----
+function startTest() {
+  currentQ = 0; answers = {}; showQ32 = false;
+  showPage('question');
+  renderQuestion();
+}
+
+// ---- Render Question ----
+function renderQuestion() {
+  const total = showQ32 ? 32 : 31;
+  const q = QUESTIONS[currentQ];
+
+  document.getElementById('progress-fill').style.width = ((currentQ / total) * 100) + '%';
+  document.getElementById('q-counter').textContent = `第 ${currentQ + 1} / ${total} 题`;
+
+  const flowLabel = document.getElementById('q-flow-label');
+  if (q.isBranch)      { flowLabel.textContent = '分支题'; flowLabel.style.color = '#ffd93d'; }
+  else if (q.isHidden) { flowLabel.textContent = '隐藏题'; flowLabel.style.color = '#ff6b6b'; }
+  else                 { flowLabel.textContent = '计分题'; flowLabel.style.color = '#00d4ff'; }
+
+  document.getElementById('q-num').textContent = 'Q' + q.id;
+  document.getElementById('q-dims').textContent = q.dimLabel;
+  document.getElementById('q-text').textContent = q.text;
+
+  const container = document.getElementById('options-list');
+  container.innerHTML = '';
+  const labels = ['A', 'B', 'C'];
+  const levels = ['L', 'M', 'H'];
+  const sel = answers[currentQ];
+
+  q.opts.forEach((optText, i) => {
+    const val = OPTION_VALUES[i];
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn' + (sel === val ? ' selected' : '');
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', sel === val ? 'true' : 'false');
+    btn.innerHTML = `<span class="opt-letter">${labels[i]}</span><span>${optText}</span><span class="opt-level">${levels[i]}</span>`;
+    btn.addEventListener('click', () => {
+      answers[currentQ] = val;
+      document.getElementById('btn-next').disabled = false;
+      renderQuestion();
+    });
+    container.appendChild(btn);
+  });
+
+  document.getElementById('btn-prev').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = currentQ === total - 1 ? '提交 →' : '下一题 →';
+  btnNext.disabled = sel == null;
+}
+
+// ---- Navigation ----
+function nextQuestion() {
+  if (answers[currentQ] == null) return;
+  if (currentQ === 30 && !showQ32 && answers[30] === 3) { showQ32 = true; }
+  const total = showQ32 ? 32 : 31;
+  if (currentQ < total - 1) { currentQ++; renderQuestion(); }
+  else { calculate(); }
+}
+function prevQuestion() { if (currentQ > 0) { currentQ--; renderQuestion(); } }
+
+// ---- Calculate ----
+function calculate() {
+  showPage('loading');
+
+  // Aggregate per-dimension
+  const dimScores = DIMS.map(() => ({ sum:0, count:0 }));
+  QUESTIONS.forEach((q, qi) => {
+    const val = answers[qi];
+    if (val == null || q.isBranch) return;
+    q.dims.forEach(di => { dimScores[di].sum += val; dimScores[di].count += 1; });
+  });
+  const rawVec = dimScores.map(ds => ds.count > 0 ? ds.sum / ds.count : 2);
+
+  // Z-score
+  const mean = rawVec.reduce((a,b)=>a+b,0)/15;
+  const std = Math.sqrt(rawVec.reduce((s,v)=>s+(v-mean)**2,0)/15)||1;
+  const normalized = rawVec.map(v => Math.max(0,Math.min(100, 50+(v-mean)/std*15)));
+  const toLevel = s => s<33?1:s<66?2:3;
+  const userLevels = normalized.map(toLevel);
+
+  // GOD / NOOB
+  const allHigh = userLevels.every(v=>v===3);
+  const allLowNoH = userLevels.every(v=>v<=2) && !userLevels.some(v=>v===3);
+
+  // Manhattan distance
+  const scored = TEMPLATES.map(t => {
+    const dist = t.vec.reduce((s,tv,i)=>s+Math.abs(userLevels[i]-tv), 0);
+    return { ...t, dist, pct: Math.max(0,Math.round((1-dist/30)*100)) };
+  });
+  scored.sort((a,b)=>b.pct-a.pct||a.dist-b.dist);
+
+  let primary, badge, top3;
+  if (allHigh) {
+    primary = { ...HIDDEN_GOD, pct:100, dist:0 };
+    badge = 'HIDDEN · 隐藏人格';
+    top3 = [primary, ...scored.slice(0,2)];
+  } else if (allLowNoH) {
+    primary = { ...HIDDEN_NOOB, pct:100, dist:0 };
+    badge = 'HIDDEN · 隐藏人格';
+    top3 = [primary, ...scored.slice(0,2)];
+  } else {
+    primary = scored[0];
+    badge = primary.pct >= 80 ? 'TOP MATCH' : 'NEAR MATCH';
+    top3 = scored.slice(0,3);
+  }
+
+  setTimeout(() => {
+    document.getElementById('result-badge').textContent = badge;
+    document.getElementById('result-type').textContent = primary.name;
+    document.getElementById('result-tagline').textContent = primary.tagline;
+    document.getElementById('result-match').textContent = `匹配度 ${primary.pct}%`;
+    document.getElementById('result-desc').textContent = primary.desc;
+
+    // Team cards
+    document.getElementById('team-fit').innerHTML =
+      (primary.fit||[]).map(f=>`<span class="tag fit">${f}</span>`).join('');
+    document.getElementById('team-avoid').textContent = primary.avoid||'';
+    document.getElementById('team-recs').innerHTML =
+      (primary.recs||[]).map(r=>`<span class="tag rec">${r}</span>`).join('');
+    document.getElementById('team-weakness').textContent = primary.weakness||'';
+
+    // Bars + matches (radar drawn after page visible below)
+    renderDimBars(userLevels, normalized);
+    renderMatches(top3);
+
+    // Share text
+    const shareLabel = primary.name.split(' ')[0] || primary.name;
+    lastShareText =
+      `【HCTI黑客松人格测试】\n` +
+      `我的人格类型是：${primary.name}\n` +
+      `匹配度：${primary.pct}%\n` +
+      `一句话：${primary.tagline}\n` +
+      `\n` +
+      `最适合分工：${(primary.fit||[]).join('、')}\n` +
+      `推荐队友：${(primary.recs||[]).join('、')}\n` +
+      `\n` +
+      `测测你在黑客松中是什么人格 → [链接占位]\n` +
+      `#HCTI #黑客松人格测试`;
+    document.getElementById('share-text').textContent = lastShareText;
+    document.getElementById('btn-copy').classList.remove('copied');
+    document.getElementById('btn-copy').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      一键复制文案`;
+
+    showPage('result');
+    // Draw radar after canvas is visible
+    setTimeout(() => drawRadar(normalized), 100);
+  }, 1600);
+}
+
+// ---- Canvas Radar Chart (5-axis pentagon) ----
+function drawRadar(scores) {
+  const canvas = document.getElementById('radar-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+  const r = 150;
+  const n = 5;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid rings
+  for (let ring = 1; ring <= 3; ring++) {
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = -Math.PI/2 + (2*Math.PI*i)/n;
+      const rr = r * ring/3;
+      const x = cx + rr * Math.cos(angle);
+      const y = cy + rr * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = ring === 3 ? '#1f1f2e' : '#151520';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Axes
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI/2 + (2*Math.PI*i)/n;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+    ctx.strokeStyle = '#1a1a28';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Data pentagon
+  const groupAvgs = DIM_GROUPS.map(g => {
+    const avg = g.dims.reduce((s, di) => s + scores[di], 0) / 3;
+    return avg / 100; // 0-1
+  });
+
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI/2 + (2*Math.PI*i)/n;
+    const rr = r * groupAvgs[i];
+    const x = cx + rr * Math.cos(angle);
+    const y = cy + rr * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,255,65,0.1)';
+  ctx.fill();
+  ctx.strokeStyle = '#00ff41';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = 'rgba(0,255,65,0.5)';
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Data points
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI/2 + (2*Math.PI*i)/n;
+    const rr = r * groupAvgs[i];
+    ctx.beginPath();
+    ctx.arc(cx + rr * Math.cos(angle), cy + rr * Math.sin(angle), 5, 0, Math.PI*2);
+    ctx.fillStyle = DIM_GROUPS[i].color;
+    ctx.fill();
+    ctx.strokeStyle = '#0a0a0f';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Labels
+  ctx.font = '600 13px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI/2 + (2*Math.PI*i)/n;
+    const lr = r + 32;
+    const x = cx + lr * Math.cos(angle);
+    const y = cy + lr * Math.sin(angle);
+    ctx.fillStyle = DIM_GROUPS[i].color;
+    // Score label
+    const scorePct = Math.round(groupAvgs[i] * 100);
+    ctx.fillText(DIM_GROUPS[i].label + ' ' + scorePct, x, y);
+  }
+}
+
+// ---- Dimension Bars ----
+function renderDimBars(levels, scores) {
+  let html = '';
+  DIM_GROUPS.forEach(g => {
+    html += `<div class="dim-group"><div class="dim-group-label ${g.css}">${g.label}</div>`;
+    g.dims.forEach(i => {
+      const ltr = LEVEL_LABELS[levels[i]];
+      html +=
+        `<div class="dim-row">
+          <span class="dim-name">${DIMS[i]}</span>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-fill ${g.fillCss}" style="width:${scores[i]}%"></div>
+          </div>
+          <span class="dim-val" style="color:${g.color}">${ltr}</span>
+        </div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('dim-chart').innerHTML = html;
+}
+
+// ---- Top 3 Matches ----
+function renderMatches(top3) {
+  document.getElementById('matches-list').innerHTML = top3.map((m,i) => `
+    <div class="match-card top${i+1}">
+      <span class="match-rank">#${i+1}</span>
+      <div class="match-info">
+        <div class="match-name">${m.name}</div>
+        <div class="match-tagline">${m.tagline}</div>
+      </div>
+      <span class="match-pct">${m.pct}%</span>
+    </div>
+  `).join('');
+}
+
+// ---- Copy Share Text ----
+function copyShare() {
+  if (!lastShareText) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(lastShareText).then(() => {
+      const btn = document.getElementById('btn-copy');
+      btn.classList.add('copied');
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        已复制！
+      `;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          一键复制文案`;
+      }, 2000);
+    }).catch(() => fallbackCopy(lastShareText));
+  } else {
+    fallbackCopy(lastShareText);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+  const btn = document.getElementById('btn-copy');
+  btn.classList.add('copied');
+  btn.textContent = '已复制！';
+  setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '一键复制文案'; }, 2000);
+}
+
+// ---- Restart ----
+function restartTest() {
+  currentQ = 0; answers = {}; showQ32 = false; lastShareText = '';
+  showPage('start');
+}
+</script>
+
+</body>
+</html>
