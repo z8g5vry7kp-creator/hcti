@@ -498,6 +498,81 @@ canvas#radar-canvas {
   .loading-text { animation: none; }
   .dim-bar-fill { transition: none; }
 }
+
+/* ================================================================
+   MATRIX RAIN CANVAS
+   ================================================================ */
+#matrix-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  opacity: 0.18; pointer-events: none;
+}
+
+/* ================================================================
+   TERMINAL WINDOW
+   ================================================================ */
+.terminal {
+  background: #0a0a0d; border: 1px solid #1a2a1a; border-radius: 12px;
+  margin-bottom: 24px; overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,255,65,0.06), inset 0 0 30px rgba(0,0,0,0.5);
+}
+.term-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px; background: #0d0d12;
+  border-bottom: 1px solid #1a2a1a;
+}
+.term-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.dot-red    { background: #ff5f56; box-shadow: 0 0 4px rgba(255,95,86,0.5); }
+.dot-yellow { background: #ffbd2e; box-shadow: 0 0 4px rgba(255,189,46,0.5); }
+.dot-green  { background: #27c93f; box-shadow: 0 0 4px rgba(39,201,63,0.5); }
+.term-title {
+  margin-left: 8px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: #444; letter-spacing: 1px;
+}
+.term-body {
+  padding: 16px 18px; min-height: 120px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.8;
+  color: #00ff41;
+}
+.term-prompt { color: #00d4ff; }
+.term-dim   { color: #444; }
+.term-success { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
+.term-cursor { color: #00ff41; animation: blink-cursor 1s step-end infinite; }
+@keyframes blink-cursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ================================================================
+   GLITCH EFFECT
+   ================================================================ */
+.glitch {
+  position: relative; display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #00ff41 20%, #00d4ff 80%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+}
+.glitch::before {
+  animation: glitch-r 4s infinite;
+}
+.glitch::after {
+  animation: glitch-b 4s infinite;
+}
+@keyframes glitch-r {
+  0%, 94%, 96%, 98%, 100% { opacity: 0; transform: translate(0); }
+  95% { opacity: 0.6; transform: translate(-2px, 1px); }
+  97% { opacity: 0.4; transform: translate(2px, -1px); }
+}
+@keyframes glitch-b {
+  0%, 93%, 95%, 97%, 100% { opacity: 0; transform: translate(0); }
+  94% { opacity: 0.5; transform: translate(3px, -1px); }
+  96% { opacity: 0.3; transform: translate(-2px, 1px); }
+}
 </style>
 </head>
 <body>
@@ -506,6 +581,8 @@ canvas#radar-canvas {
 <div class="bg-grid"></div>
 <div class="bg-glow-1"></div>
 <div class="bg-glow-2"></div>
+<!-- Matrix Rain Canvas -->
+<canvas id="matrix-canvas"></canvas>
 
 <!-- ============================================================
      APP CONTAINER
@@ -531,17 +608,28 @@ canvas#radar-canvas {
           <rect x="52" y="46" width="8" height="4" rx="1" fill="#00ff41" opacity="0.6"/>
         </svg>
       </div>
-      <h1>HCTI</h1>
+      <h1 class="glitch" data-text="HCTI">HCTI</h1>
       <p class="tagline">HACKATHON TYPE INDICATOR</p>
       <p class="sub-info">5维 · 32题 · 27种黑客人格 · 组队匹配</p>
     </div>
 
-    <div class="intro-card">
-      <h3>&gt; 发现你在黑客松中的超能力</h3>
-      <p>5分钟快速测评，从五大竞赛维度分析你的团队定位。你的回答会生成 15 维人格向量，匹配最接近的黑客松角色原型与组队建议。</p>
-      <div class="dim-tags">
-        <span class="dt-h">H 内核</span><span class="dt-c">C 创作</span><span class="dt-e">E 执行</span>
-        <span class="dt-t">T 团队</span><span class="dt-p">P 答辩</span>
+    <!-- Terminal Intro -->
+    <div class="terminal" id="start-terminal">
+      <div class="term-header">
+        <span class="term-dot dot-red"></span>
+        <span class="term-dot dot-yellow"></span>
+        <span class="term-dot dot-green"></span>
+        <span class="term-title">hcti://system.init</span>
+      </div>
+      <div class="term-body" id="term-body">
+        <p class="term-line"><span class="term-prompt">root@hcti:~$</span> ./init_hackathon_matrix --verbose</p>
+        <p class="term-line term-loading" id="term-l1"><span class="term-cursor">&block;</span> Initializing personality framework...</p>
+        <p class="term-line term-loading" id="term-l2" style="display:none"><span class="term-cursor">&block;</span> Loading 5 competition dimensions...</p>
+        <p class="term-line term-loading" id="term-l3" style="display:none"><span class="term-cursor">&block;</span> Mapping 15 sub-dimension vectors...</p>
+        <p class="term-line term-loading" id="term-l4" style="display:none"><span class="term-cursor">&block;</span> Indexing 27 personality archetypes...</p>
+        <p class="term-line term-loading" id="term-l5" style="display:none"><span class="term-cursor">&block;</span> Calibrating Manhattan distance engine...</p>
+        <p class="term-line term-loading" id="term-l6" style="display:none"><span class="term-cursor">&block;</span> Syncing team match algorithm...</p>
+        <p class="term-line term-ok" id="term-done" style="display:none"><span class="term-prompt">root@hcti:~$</span> <span class="term-success">SYSTEM READY.</span> <span class="term-dim">32 questions loaded. Awaiting subject.</span></p>
       </div>
     </div>
 
@@ -1260,7 +1348,92 @@ function fallbackCopy(text) {
 function restartTest() {
   currentQ = 0; answers = {}; showQ32 = false; lastShareText = '';
   showPage('start');
+  startTerminalBoot();
 }
+
+// ================================================================
+//   MATRIX RAIN
+// ================================================================
+(function(){
+  const canvas = document.getElementById('matrix-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, cols, drops;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    cols = Math.floor(w / 20);
+    drops = [];
+    for (let i = 0; i < cols; i++) { drops[i] = Math.random() * -h; }
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF<>/{}[]|&^%$#@!;:';
+
+  function draw() {
+    ctx.fillStyle = 'rgba(10,10,15,0.06)';
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = '16px "JetBrains Mono", monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      const x = i * 20;
+      const y = drops[i] * 20;
+      ctx.fillStyle = y < h * 0.3 ? 'rgba(0,255,65,0.4)' : y < h * 0.7 ? 'rgba(0,255,65,0.25)' : 'rgba(0,255,65,0.06)';
+      ctx.fillText(text, x, y);
+      if (y > h && Math.random() > 0.975) { drops[i] = 0; }
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ================================================================
+//   TERMINAL BOOT SEQUENCE
+// ================================================================
+function startTerminalBoot() {
+  const lines = [
+    document.getElementById('term-l1'),
+    document.getElementById('term-l2'),
+    document.getElementById('term-l3'),
+    document.getElementById('term-l4'),
+    document.getElementById('term-l5'),
+    document.getElementById('term-l6'),
+    document.getElementById('term-done'),
+  ];
+  // Hide all loading lines
+  lines.forEach(l => { if (l) l.style.display = 'none'; });
+
+  let i = 0;
+  function showNext() {
+    if (i === 0) {
+      // Show first loading line
+      lines[0].style.display = 'block';
+      i++;
+      setTimeout(showNext, 350 + Math.random() * 400);
+    } else if (i < lines.length - 1) {
+      // Finish current, show next
+      lines[i-1].classList.remove('term-loading');
+      lines[i-1].innerHTML = lines[i-1].innerHTML.replace('<span class="term-cursor">&block;</span>', '<span class="term-dim">[OK]</span>');
+      lines[i].style.display = 'block';
+      i++;
+      setTimeout(showNext, 300 + Math.random() * 500);
+    } else {
+      // Done
+      if (i > 0) {
+        lines[i-1].classList.remove('term-loading');
+        lines[i-1].innerHTML = lines[i-1].innerHTML.replace('<span class="term-cursor">&block;</span>', '<span class="term-dim">[OK]</span>');
+      }
+      lines[lines.length-1].style.display = 'block';
+    }
+  }
+  setTimeout(showNext, 600);
+}
+
+// Auto-start boot on page load
+startTerminalBoot();
 </script>
 
 </body>
