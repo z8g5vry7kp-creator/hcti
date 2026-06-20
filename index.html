@@ -535,6 +535,57 @@ canvas#radar-canvas {
   font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.8;
   color: #00ff41;
 }
+
+/* ================================================================
+   HACKER STATS COUNTER
+   ================================================================ */
+.stats-row {
+  display: flex; gap: 10px; margin-bottom: 24px;
+}
+.stat-item {
+  flex: 1; background: #0a0a0d; border: 1px solid #1a2a1a; border-radius: 10px;
+  padding: 14px 10px; text-align: center;
+}
+.stat-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.58rem;
+  color: #444; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase;
+}
+.stat-value {
+  font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700;
+  color: #00ff41; text-shadow: 0 0 10px rgba(0,255,65,0.4);
+}
+
+/* ================================================================
+   PARTICLE NETWORK
+   ================================================================ */
+#particle-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
+
+/* ================================================================
+   GLITCH TRANSITION OVERLAY
+   ================================================================ */
+.glitch-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: #0a0a0f; pointer-events: none;
+  opacity: 0; transition: opacity 0.1s;
+}
+.glitch-overlay.fire {
+  animation: glitch-slam 0.5s ease-out forwards;
+}
+@keyframes glitch-slam {
+  0%   { opacity: 1; background: #00ff41; clip-path: inset(0 0 95% 0); }
+  5%   { opacity: 1; background: #00d4ff; clip-path: inset(0 0 0 0); }
+  10%  { opacity: 1; background: #0a0a0f; clip-path: inset(70% 0 0 0); }
+  15%  { opacity: 1; background: #ff006e; clip-path: inset(20% 0 60% 0); }
+  20%  { opacity: 1; background: #0a0a0f; clip-path: inset(0 80% 0 0); }
+  25%  { opacity: 1; background: #00ff41; clip-path: inset(10% 0 80% 0); }
+  30%  { opacity: 1; background: #0a0a0f; clip-path: inset(0 0 0 60%); }
+  40%  { opacity: 1; background: #00d4ff; clip-path: inset(50% 0 40% 0); }
+  55%  { opacity: 0.8; background: #0a0a0f; clip-path: inset(0 0 0 0); }
+  70%  { opacity: 0.4; background: #00ff41; clip-path: inset(0 0 30% 0); }
+  100% { opacity: 0; clip-path: inset(0 0 0 0); }
+}
 .term-prompt { color: #00d4ff; }
 .term-dim   { color: #444; }
 .term-success { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
@@ -583,6 +634,10 @@ canvas#radar-canvas {
 <div class="bg-glow-2"></div>
 <!-- Matrix Rain Canvas -->
 <canvas id="matrix-canvas"></canvas>
+<!-- Particle Network Canvas -->
+<canvas id="particle-canvas"></canvas>
+<!-- Glitch Transition Overlay -->
+<div class="glitch-overlay" id="glitch-overlay"></div>
 
 <!-- ============================================================
      APP CONTAINER
@@ -630,6 +685,22 @@ canvas#radar-canvas {
         <p class="term-line term-loading" id="term-l5" style="display:none"><span class="term-cursor">&block;</span> Calibrating Manhattan distance engine...</p>
         <p class="term-line term-loading" id="term-l6" style="display:none"><span class="term-cursor">&block;</span> Syncing team match algorithm...</p>
         <p class="term-line term-ok" id="term-done" style="display:none"><span class="term-prompt">root@hcti:~$</span> <span class="term-success">SYSTEM READY.</span> <span class="term-dim">32 questions loaded. Awaiting subject.</span></p>
+      </div>
+    </div>
+
+    <!-- Hacker Stats -->
+    <div class="stats-row" id="stats-row" style="display:none">
+      <div class="stat-item">
+        <div class="stat-label">Archetypes</div>
+        <div class="stat-value" id="stat-archetypes">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Dimensions</div>
+        <div class="stat-value" id="stat-dimensions">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="stat-accuracy">0%</div>
       </div>
     </div>
 
@@ -1035,9 +1106,18 @@ function showPage(name) {
 
 // ---- Start ----
 function startTest() {
-  currentQ = 0; answers = {}; showQ32 = false;
-  showPage('question');
-  renderQuestion();
+  // Fire glitch transition
+  const overlay = document.getElementById('glitch-overlay');
+  if (overlay) {
+    overlay.classList.remove('fire');
+    void overlay.offsetWidth;
+    overlay.classList.add('fire');
+  }
+  setTimeout(() => {
+    currentQ = 0; answers = {}; showQ32 = false;
+    showPage('question');
+    renderQuestion();
+  }, 400);
 }
 
 // ---- Render Question ----
@@ -1427,6 +1507,8 @@ function startTerminalBoot() {
         lines[i-1].innerHTML = lines[i-1].innerHTML.replace('<span class="term-cursor">&block;</span>', '<span class="term-dim">[OK]</span>');
       }
       lines[lines.length-1].style.display = 'block';
+      // Trigger stats counter after terminal boot
+      setTimeout(fireStatsCounter, 400);
     }
   }
   setTimeout(showNext, 600);
@@ -1434,6 +1516,106 @@ function startTerminalBoot() {
 
 // Auto-start boot on page load
 startTerminalBoot();
+
+// ================================================================
+//   HACKER STATS COUNTER
+// ================================================================
+function animateStat(el, target, suffix, duration) {
+  const start = performance.now();
+  const isFloat = target % 1 !== 0;
+  function tick(now) {
+    const p = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - p, 3); // ease-out
+    const val = isFloat ? (eased * target).toFixed(1) : Math.floor(eased * target);
+    el.textContent = val + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function fireStatsCounter() {
+  const row = document.getElementById('stats-row');
+  if (!row) return;
+  row.style.display = 'flex';
+  const arch = document.getElementById('stat-archetypes');
+  const dims = document.getElementById('stat-dimensions');
+  const acc  = document.getElementById('stat-accuracy');
+  animateStat(arch, 27, '',    1600);
+  animateStat(dims, 15, '',    1200);
+  animateStat(acc,  97.3, '%', 1800);
+}
+
+// ================================================================
+//   PARTICLE NETWORK
+// ================================================================
+(function(){
+  const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, particles;
+
+  function resize() {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    initParticles();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function initParticles() {
+    const count = Math.floor(w * h / 12000);
+    particles = [];
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 0.5,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+
+    // Update & draw particles
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,255,65,0.25)';
+      ctx.fill();
+    }
+
+    // Draw connections
+    const maxDist = 100;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,255,65,${0.06 * (1 - dist / maxDist)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 </script>
 
 </body>
