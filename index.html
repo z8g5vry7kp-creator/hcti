@@ -500,71 +500,22 @@ canvas#radar-canvas {
 }
 
 /* ================================================================
-   MATRIX RAIN CANVAS
+   PULSE REVEAL CANVAS
    ================================================================ */
-#matrix-canvas {
-  position: fixed; inset: 0; z-index: 0;
-  opacity: 0.18; pointer-events: none;
-}
-
-/* ================================================================
-   TERMINAL WINDOW
-   ================================================================ */
-.terminal {
-  background: #0a0a0d; border: 1px solid #1a2a1a; border-radius: 12px;
-  margin-bottom: 24px; overflow: hidden;
-  box-shadow: 0 0 30px rgba(0,255,65,0.06), inset 0 0 30px rgba(0,0,0,0.5);
-}
-.term-header {
-  display: flex; align-items: center; gap: 6px;
-  padding: 10px 14px; background: #0d0d12;
-  border-bottom: 1px solid #1a2a1a;
-}
-.term-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-}
-.dot-red    { background: #ff5f56; box-shadow: 0 0 4px rgba(255,95,86,0.5); }
-.dot-yellow { background: #ffbd2e; box-shadow: 0 0 4px rgba(255,189,46,0.5); }
-.dot-green  { background: #27c93f; box-shadow: 0 0 4px rgba(39,201,63,0.5); }
-.term-title {
-  margin-left: 8px; font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem; color: #444; letter-spacing: 1px;
-}
-.term-body {
-  padding: 16px 18px; min-height: 120px;
-  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.8;
-  color: #00ff41;
-}
-
-/* ================================================================
-   HACKER STATS COUNTER
-   ================================================================ */
-.stats-row {
-  display: flex; gap: 10px; margin-bottom: 24px;
-}
-.stat-item {
-  flex: 1; background: #0a0a0d; border: 1px solid #1a2a1a; border-radius: 10px;
-  padding: 14px 10px; text-align: center;
-}
-.stat-label {
-  font-family: 'JetBrains Mono', monospace; font-size: 0.58rem;
-  color: #444; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase;
-}
-.stat-value {
-  font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700;
-  color: #00ff41; text-shadow: 0 0 10px rgba(0,255,65,0.4);
-}
-
-/* ================================================================
-   PARTICLE NETWORK
-   ================================================================ */
-#particle-canvas {
+#pulse-canvas {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
 }
 
 /* ================================================================
-   GLITCH TRANSITION OVERLAY
+   REVEAL ANIMATION
    ================================================================ */
+.reveal-text, .reveal-btn {
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.8s ease 500ms, transform 0.8s ease 500ms;
+}
+.reveal-text.show, .reveal-btn.show {
+  opacity: 1; transform: translateY(0);
+}
 .glitch-overlay {
   position: fixed; inset: 0; z-index: 100;
   background: #0a0a0f; pointer-events: none;
@@ -632,10 +583,8 @@ canvas#radar-canvas {
 <div class="bg-grid"></div>
 <div class="bg-glow-1"></div>
 <div class="bg-glow-2"></div>
-<!-- Matrix Rain Canvas -->
-<canvas id="matrix-canvas"></canvas>
-<!-- Particle Network Canvas -->
-<canvas id="particle-canvas"></canvas>
+<!-- Pulse Reveal Canvas -->
+<canvas id="pulse-canvas"></canvas>
 <!-- Glitch Transition Overlay -->
 <div class="glitch-overlay" id="glitch-overlay"></div>
 
@@ -647,8 +596,7 @@ canvas#radar-canvas {
   <!-- ========== START PAGE ========== -->
   <section class="page active" id="page-start">
     <div class="start-logo">
-      <!-- SVG: circuit-chip icon (not emoji) -->
-      <div class="logo-icon">
+      <div class="logo-icon" id="logo-icon">
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="8" y="8" width="48" height="48" rx="8" stroke="#00d4ff" stroke-width="2" fill="none" opacity="0.6"/>
           <rect x="20" y="20" width="24" height="24" rx="4" stroke="#00ff41" stroke-width="2" fill="none"/>
@@ -665,49 +613,13 @@ canvas#radar-canvas {
       </div>
       <h1 class="glitch" data-text="HCTI">HCTI</h1>
       <p class="tagline">HACKATHON TYPE INDICATOR</p>
-      <p class="sub-info">5维 · 32题 · 27种黑客人格 · 组队匹配</p>
+      <p class="sub-info reveal-text" id="sub-info">5维竞赛模型 · 32道场景题 · 27种人格原型 · AI组队匹配</p>
     </div>
 
-    <!-- Terminal Intro -->
-    <div class="terminal" id="start-terminal">
-      <div class="term-header">
-        <span class="term-dot dot-red"></span>
-        <span class="term-dot dot-yellow"></span>
-        <span class="term-dot dot-green"></span>
-        <span class="term-title">hcti://system.init</span>
-      </div>
-      <div class="term-body" id="term-body">
-        <p class="term-line"><span class="term-prompt">root@hcti:~$</span> ./init_hackathon_matrix --verbose</p>
-        <p class="term-line term-loading" id="term-l1"><span class="term-cursor">&block;</span> Initializing personality framework...</p>
-        <p class="term-line term-loading" id="term-l2" style="display:none"><span class="term-cursor">&block;</span> Loading 5 competition dimensions...</p>
-        <p class="term-line term-loading" id="term-l3" style="display:none"><span class="term-cursor">&block;</span> Mapping 15 sub-dimension vectors...</p>
-        <p class="term-line term-loading" id="term-l4" style="display:none"><span class="term-cursor">&block;</span> Indexing 27 personality archetypes...</p>
-        <p class="term-line term-loading" id="term-l5" style="display:none"><span class="term-cursor">&block;</span> Calibrating Manhattan distance engine...</p>
-        <p class="term-line term-loading" id="term-l6" style="display:none"><span class="term-cursor">&block;</span> Syncing team match algorithm...</p>
-        <p class="term-line term-ok" id="term-done" style="display:none"><span class="term-prompt">root@hcti:~$</span> <span class="term-success">SYSTEM READY.</span> <span class="term-dim">32 questions loaded. Awaiting subject.</span></p>
-      </div>
-    </div>
-
-    <!-- Hacker Stats -->
-    <div class="stats-row" id="stats-row" style="display:none">
-      <div class="stat-item">
-        <div class="stat-label">Archetypes</div>
-        <div class="stat-value" id="stat-archetypes">0</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Dimensions</div>
-        <div class="stat-value" id="stat-dimensions">0</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Accuracy</div>
-        <div class="stat-value" id="stat-accuracy">0%</div>
-      </div>
-    </div>
-
-    <button class="btn-start" onclick="startTest()" aria-label="开始测试">
-      &gt; 开 始 测 试 _
+    <button class="btn-start reveal-btn" id="btn-start-wrap" onclick="startTest()" aria-label="开始测试">
+      &gt; INITIALIZE _
     </button>
-    <div class="app-footer">HCTI v1.0 · 2026 Hackathon</div>
+    <div class="app-footer reveal-text" id="start-footer">HCTI v1.0 · 2026 Hackathon</div>
   </section>
 
   <!-- ========== QUESTION PAGE ========== -->
@@ -1428,194 +1340,148 @@ function fallbackCopy(text) {
 function restartTest() {
   currentQ = 0; answers = {}; showQ32 = false; lastShareText = '';
   showPage('start');
-  startTerminalBoot();
 }
 
 // ================================================================
-//   MATRIX RAIN
+//   PULSE REVEAL — heartbeat → ring burst → logo reveal
 // ================================================================
 (function(){
-  const canvas = document.getElementById('matrix-canvas');
+  const canvas = document.getElementById('pulse-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let w, h, cols, drops;
-
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    cols = Math.floor(w / 20);
-    drops = [];
-    for (let i = 0; i < cols; i++) { drops[i] = Math.random() * -h; }
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF<>/{}[]|&^%$#@!;:';
-
-  function draw() {
-    ctx.fillStyle = 'rgba(10,10,15,0.06)';
-    ctx.fillRect(0, 0, w, h);
-    ctx.font = '16px "JetBrains Mono", monospace';
-    for (let i = 0; i < drops.length; i++) {
-      const text = chars[Math.floor(Math.random() * chars.length)];
-      const x = i * 20;
-      const y = drops[i] * 20;
-      ctx.fillStyle = y < h * 0.3 ? 'rgba(0,255,65,0.4)' : y < h * 0.7 ? 'rgba(0,255,65,0.25)' : 'rgba(0,255,65,0.06)';
-      ctx.fillText(text, x, y);
-      if (y > h && Math.random() > 0.975) { drops[i] = 0; }
-      drops[i]++;
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-// ================================================================
-//   TERMINAL BOOT SEQUENCE
-// ================================================================
-function startTerminalBoot() {
-  const lines = [
-    document.getElementById('term-l1'),
-    document.getElementById('term-l2'),
-    document.getElementById('term-l3'),
-    document.getElementById('term-l4'),
-    document.getElementById('term-l5'),
-    document.getElementById('term-l6'),
-    document.getElementById('term-done'),
-  ];
-  // Hide all loading lines
-  lines.forEach(l => { if (l) l.style.display = 'none'; });
-
-  let i = 0;
-  function showNext() {
-    if (i === 0) {
-      // Show first loading line
-      lines[0].style.display = 'block';
-      i++;
-      setTimeout(showNext, 350 + Math.random() * 400);
-    } else if (i < lines.length - 1) {
-      // Finish current, show next
-      lines[i-1].classList.remove('term-loading');
-      lines[i-1].innerHTML = lines[i-1].innerHTML.replace('<span class="term-cursor">&block;</span>', '<span class="term-dim">[OK]</span>');
-      lines[i].style.display = 'block';
-      i++;
-      setTimeout(showNext, 300 + Math.random() * 500);
-    } else {
-      // Done
-      if (i > 0) {
-        lines[i-1].classList.remove('term-loading');
-        lines[i-1].innerHTML = lines[i-1].innerHTML.replace('<span class="term-cursor">&block;</span>', '<span class="term-dim">[OK]</span>');
-      }
-      lines[lines.length-1].style.display = 'block';
-      // Trigger stats counter after terminal boot
-      setTimeout(fireStatsCounter, 400);
-    }
-  }
-  setTimeout(showNext, 600);
-}
-
-// Auto-start boot on page load
-startTerminalBoot();
-
-// ================================================================
-//   HACKER STATS COUNTER
-// ================================================================
-function animateStat(el, target, suffix, duration) {
-  const start = performance.now();
-  const isFloat = target % 1 !== 0;
-  function tick(now) {
-    const p = Math.min(1, (now - start) / duration);
-    const eased = 1 - Math.pow(1 - p, 3); // ease-out
-    const val = isFloat ? (eased * target).toFixed(1) : Math.floor(eased * target);
-    el.textContent = val + suffix;
-    if (p < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-
-function fireStatsCounter() {
-  const row = document.getElementById('stats-row');
-  if (!row) return;
-  row.style.display = 'flex';
-  const arch = document.getElementById('stat-archetypes');
-  const dims = document.getElementById('stat-dimensions');
-  const acc  = document.getElementById('stat-accuracy');
-  animateStat(arch, 27, '',    1600);
-  animateStat(dims, 15, '',    1200);
-  animateStat(acc,  97.3, '%', 1800);
-}
-
-// ================================================================
-//   PARTICLE NETWORK
-// ================================================================
-(function(){
-  const canvas = document.getElementById('particle-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let w, h, particles;
+  let w, h, cx, cy;
+  let t = 0;
+  let phase = 'heartbeat'; // heartbeat | burst | idle
+  let burstR = 0;
+  let heartbeatCount = 0;
+  let beatAlpha = 0;
+  let beatR = 0;
+  let lastBeatTime = 0;
+  const HEARTBEAT_INTERVAL = 700; // ms between beats
+  const TOTAL_BEATS = 3;
+  const BURST_SPEED = 6;
 
   function resize() {
     w = canvas.width  = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    initParticles();
+    cx = w / 2;
+    cy = h / 2;
   }
   resize();
   window.addEventListener('resize', resize);
 
-  function initParticles() {
-    const count = Math.floor(w * h / 12000);
-    particles = [];
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 1.5 + 0.5,
-      });
-    }
-  }
-
-  function draw() {
+  function draw(now) {
     ctx.clearRect(0, 0, w, h);
+    const dt = now - (lastBeatTime || now);
+    lastBeatTime = now;
+    t = now;
 
-    // Update & draw particles
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = w;
-      if (p.x > w) p.x = 0;
-      if (p.y < 0) p.y = h;
-      if (p.y > h) p.y = 0;
+    if (phase === 'heartbeat') {
+      // Pulsing dot
+      const elapsed = t % HEARTBEAT_INTERVAL;
+      const progress = elapsed / HEARTBEAT_INTERVAL;
 
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,255,65,0.25)';
-      ctx.fill();
-    }
+      if (progress < 0.15) {
+        // Quick expand
+        beatR = 3 + 12 * (progress / 0.15);
+        beatAlpha = 0.8 * (progress / 0.15);
+      } else if (progress < 0.3) {
+        // Quick contract
+        beatR = 15 - 12 * ((progress - 0.15) / 0.15);
+        beatAlpha = 0.8 * (1 - (progress - 0.15) / 0.15);
+      } else {
+        // Rest
+        beatR = 3;
+        beatAlpha = 0.3;
+      }
 
-    // Draw connections
-    const maxDist = 100;
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < maxDist) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(0,255,65,${0.06 * (1 - dist / maxDist)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
+      // Check for beat completion (when progress crosses 0)
+      const prevProgress = ((t - dt) % HEARTBEAT_INTERVAL) / HEARTBEAT_INTERVAL;
+      if (progress < prevProgress && heartbeatCount < TOTAL_BEATS) {
+        heartbeatCount++;
+        if (heartbeatCount >= TOTAL_BEATS) {
+          phase = 'burst';
+          burstR = beatR;
         }
       }
+
+      // Draw heartbeat dot with glow
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, beatR * 4);
+      glow.addColorStop(0, `rgba(0,255,65,${beatAlpha})`);
+      glow.addColorStop(0.3, `rgba(0,255,65,${beatAlpha * 0.5})`);
+      glow.addColorStop(0.7, `rgba(0,212,255,${beatAlpha * 0.1})`);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(cx - beatR * 4, cy - beatR * 4, beatR * 8, beatR * 8);
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(cx, cy, beatR * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${beatAlpha})`;
+      ctx.fill();
+
+    } else if (phase === 'burst') {
+      // Expanding ring
+      burstR += BURST_SPEED;
+      const maxR = Math.sqrt(w * w + h * h) / 2 + 50;
+      const progress = burstR / maxR;
+      const alpha = 1 - progress;
+
+      if (alpha <= 0) {
+        phase = 'idle';
+        revealContent();
+        return;
+      }
+
+      // Ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, burstR, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0,255,65,${alpha})`;
+      ctx.lineWidth = 3 + alpha * 8;
+      ctx.shadowColor = `rgba(0,255,65,${alpha})`;
+      ctx.shadowBlur = 20;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Second inner ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, burstR * 0.85, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0,212,255,${alpha * 0.5})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Glow center
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, burstR * 0.3);
+      glow.addColorStop(0, `rgba(255,255,255,${alpha * 0.6})`);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(cx - burstR * 0.3, cy - burstR * 0.3, burstR * 0.6, burstR * 0.6);
     }
-    requestAnimationFrame(draw);
+
+    if (phase !== 'idle') {
+      requestAnimationFrame(draw);
+    }
   }
-  draw();
+
+  function revealContent() {
+    // Reveal text and button
+    document.querySelectorAll('.reveal-text, .reveal-btn').forEach(el => {
+      el.classList.add('show');
+    });
+    // Logo glow-in
+    const logoIcon = document.getElementById('logo-icon');
+    if (logoIcon) {
+      logoIcon.style.transition = 'filter 0.8s ease';
+      logoIcon.style.filter = 'drop-shadow(0 0 16px rgba(0,255,65,0.5))';
+    }
+  }
+
+  requestAnimationFrame(draw);
 })();
+
+// ================================================================
+//   GLITCH TRANSITION (kept from user's favorite)
+// ================================================================
 </script>
 
 </body>
